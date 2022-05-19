@@ -1,0 +1,12 @@
+model\CommentList.class
+model\Movie.class
+database\UserAccountInfoController.class
+database\MovieCommentController.class
+database\DatabaseManagement.class
+database\MovieInfoController.class
+functions\UserAccountManagement.class
+functions\MovieInfoManagement.class
+model\People.class
+functions\KeyWordSearch.class
+model\Comment.class
+model\User.class
