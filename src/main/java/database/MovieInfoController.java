@@ -7,6 +7,7 @@ import org.checkerframework.checker.units.qual.A;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MovieInfoController {
     private static final String db_ip = "34.65.255.129";
@@ -47,8 +48,28 @@ public class MovieInfoController {
         return movie;
     }
 
+    public ArrayList<Movie> getMoviesInfoByIds(ArrayList<Integer> ids) throws SQLException {
+        String template = "select * from `movies` " +
+                "inner join `ratings` on `movies`.id=`ratings`.movie_id " +
+                "where `id` in (%s);";
+        ArrayList<Movie> movies = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        String idsString = ids.toString().split("]")[0].split("\\[")[1];
+        String executeSQL = String.format(template,idsString);
+        ResultSet result = statement.executeQuery(executeSQL);
+        while (result.next()) {
+            int movieId = result.getInt("id");
+            String title = result.getString("title");
+            int year = result.getInt("year");
+            double rating = result.getDouble("rating");
+            int votes = result.getInt("votes");
+            movies.add(new Movie(movieId, title, year,rating,votes));
+        }
+        return movies;
+    }
+
     public ArrayList<Movie> getMoviesByKeyword(String title, String starName,String directorName, int[] limit,String logicKey) throws SQLException {
-        if (logicKey.equals("or"))
+        if (logicKey==null||!logicKey.equals("or"))
         {
             logicKey = "and";
         }

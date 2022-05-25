@@ -6,12 +6,16 @@ import com.google.cloud.functions.HttpResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import database.DatabaseManagement;
+import database.MovieCommentController;
 import database.MovieInfoController;
+import database.MovieLikeController;
+import model.CommentList;
 import model.Movie;
 import model.People;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +24,28 @@ import java.util.Map;
 public class KeyWordSearch implements HttpFunction {
     private static final Gson gson = new Gson();
     private static String[] parameterList = {"Title", "StarName", "DirectorName", "Limit", "Id", "LogicKey"};
-    private static MovieInfoController database;
+    private static MovieInfoController infoDatabase;
+    private static MovieCommentController commentDatabase;
+    private static MovieLikeController likeDatabase;
 
     public KeyWordSearch() throws SQLException, ClassNotFoundException, IOException {
-        database = new DatabaseManagement().getMovieInfoController();
+        DatabaseManagement databaseManagement = new DatabaseManagement();
+        infoDatabase = databaseManagement.getMovieInfoController();
+        commentDatabase = databaseManagement.getMovieCommentController();
+        likeDatabase = databaseManagement.getMovieLikeController();
     }
 
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
+        httpResponse.appendHeader("Access-Control-Allow-Origin", "*");
+        if ("OPTIONS".equals(httpRequest.getMethod())) {
+            httpResponse.appendHeader("Access-Control-Allow-Methods", "GET");
+            httpResponse.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+            httpResponse.appendHeader("Access-Control-Max-Age", "3600");
+            httpResponse.setStatusCode(HttpURLConnection.HTTP_NO_CONTENT);
+            return;
+        }
+
         Map<String, List<String>> parameters = httpRequest.getQueryParameters();
 
         String path = httpRequest.getPath();
@@ -44,7 +62,7 @@ public class KeyWordSearch implements HttpFunction {
                 "\n[./directorMovies]:" +
                 "\n    parameters:[" + parameterList[4] + "],[" + parameterList[3] + "]" +
                 "\n[./movieInfo]:" +
-                "\n    parameters:[" + parameterList[4] + "]" +
+                "\n    parameters:[" + parameterList[4] + "],[" + parameterList[3] + "]" +
                 "\n\nUrl info:\n" +
                 getUrlInfo(httpRequest);
 
@@ -115,8 +133,9 @@ public class KeyWordSearch implements HttpFunction {
                     parameterList = getParameters(parameters, new int[]{4}, true);
                     backInfo = (String) parameterList[0];
                     if (parameterList[0] == null) {
+                        parameterList = getParameters(parameters, new int[]{4,3}, false);
                         ArrayList<String> pList = (ArrayList<String>) parameterList[1];
-                        backInfo = getMovieInfo(Integer.parseInt(pList.get(0)));
+                        backInfo = getMovieInfo(Integer.parseInt(pList.get(0)),gson.fromJson(pList.get(1), int[].class));
                     }
                     break;
                 default:
@@ -193,7 +212,7 @@ public class KeyWordSearch implements HttpFunction {
         } else {
             limit[1] = limit[1] - limit[0];
         }
-        ArrayList<Movie> movies = database.getMoviesByKeyword(title, starName, directorName, limit, logicKey);
+        ArrayList<Movie> movies = infoDatabase.getMoviesByKeyword(title, starName, directorName, limit, logicKey);
         return gson.toJson(movies);
     }
 
@@ -203,10 +222,10 @@ public class KeyWordSearch implements HttpFunction {
         } else {
             limit[1] = limit[1] - limit[0];
         }
-        ArrayList<People> stars = database.getStarsByName(starName, limit);
+        ArrayList<People> stars = infoDatabase.getStarsByName(starName, limit);
         for (int i = 0; i < stars.size(); i++) {
             int id = stars.get(i).getId();
-            stars.get(i).setMovies(database.getMoviesByStarId(id, new int[]{0, 999}));
+            stars.get(i).setMovies(infoDatabase.getMoviesByStarId(id, new int[]{0, 999}));
         }
         return gson.toJson(stars);
     }
@@ -218,9 +237,9 @@ public class KeyWordSearch implements HttpFunction {
             limit[1] = limit[1] - limit[0];
         }
         String backInfo = "Can't find Star by [id] " + id;
-        People star = database.getStarById(id);
+        People star = infoDatabase.getStarById(id);
         if (star != null) {
-            star.setMovies(database.getMoviesByStarId(id, limit));
+            star.setMovies(infoDatabase.getMoviesByStarId(id, limit));
             backInfo = gson.toJson(star);
         }
         return backInfo;
@@ -232,10 +251,10 @@ public class KeyWordSearch implements HttpFunction {
         } else {
             limit[1] = limit[1] - limit[0];
         }
-        ArrayList<People> stars = database.getDirectorsByName(directorName, limit);
+        ArrayList<People> stars = infoDatabase.getDirectorsByName(directorName, limit);
         for (int i = 0; i < stars.size(); i++) {
             int id = stars.get(i).getId();
-            stars.get(i).setMovies(database.getMoviesByDirectorId(id, new int[]{0, 999}));
+            stars.get(i).setMovies(infoDatabase.getMoviesByDirectorId(id, new int[]{0, 999}));
         }
         return gson.toJson(stars);
     }
@@ -247,18 +266,27 @@ public class KeyWordSearch implements HttpFunction {
             limit[1] = limit[1] - limit[0];
         }
         String backInfo = "Can't find Director by [id] " + id;
-        People director = database.getDirectorById(id);
+        People director = infoDatabase.getDirectorById(id);
         if (director != null) {
-            director.setMovies(database.getMoviesByDirectorId(id, limit));
+            director.setMovies(infoDatabase.getMoviesByDirectorId(id, limit));
             backInfo = gson.toJson(director);
         }
         return backInfo;
     }
 
-    private String getMovieInfo(int id) throws SQLException {
-        Movie movie = database.getMovieInfoById(id);
+    private String getMovieInfo(int id, int[] limit) throws SQLException {
+        if (limit == null || limit.length != 2) {
+            limit = new int[]{0, 100};
+        } else {
+            limit[1] = limit[1] - limit[0];
+        }
+        Movie movie = infoDatabase.getMovieInfoById(id);
         String backInfo = "Can't find Movie by [id] " + id;
         if (movie != null) {
+            CommentList commentList = commentDatabase.getCommentsByMovie(id,limit);
+            movie.setCommentList(commentList);
+            int numOfLike = likeDatabase.getNumberOfLikeByMovie(id);
+            movie.setLikes(numOfLike);
             backInfo = gson.toJson(movie);
         }
         return backInfo;

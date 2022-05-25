@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example.cloud.functions</groupId>
-    <artifactId>functions-user-account-management</artifactId>
+    <artifactId>SEP6_MovieWebsite_GoogleCloudFunction</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <properties>
         <maven.compiler.target>11</maven.compiler.target>
@@ -85,7 +85,7 @@
                 <artifactId>function-maven-plugin</artifactId>
                 <version>0.10.0</version>
                 <configuration>
-                    <functionTarget>functions.KeyWordSearch</functionTarget>
+                    <functionTarget>functions.MovieInfoManagement</functionTarget>
                 </configuration>
             </plugin>
         </plugins>

@@ -5,34 +5,33 @@ import java.util.ArrayList;
 public class CommentList {
     private ArrayList<Comment> comments;
 
-    public CommentList()
-    {
+    public CommentList() {
         comments = new ArrayList<>();
     }
 
-    public int getSize()
-    {
+    public int getSize() {
         return comments.size();
     }
 
-    public void add(Comment comment)
-    {
+    public void add(Comment comment) {
         comments.add(comment);
     }
 
-    public Comment getByIndex(int index)
-    {
-        if (index<comments.size())
+    public Comment getByIndex(int index) {
+        if (comments.size()>0)
         {
-            return comments.get(index);
+            while (index < 0) {
+                index = comments.size()+index;
+            }
+            if (index < comments.size()) {
+                return comments.get(index);
+            }
         }
         return null;
     }
 
-    public void removeByIndex(int index)
-    {
-        if (index<comments.size())
-        {
+    public void removeByIndex(int index) {
+        if (index < comments.size()) {
             comments.remove(index);
         }
     }

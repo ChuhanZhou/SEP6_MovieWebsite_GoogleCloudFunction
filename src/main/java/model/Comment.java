@@ -1,42 +1,62 @@
 package model;
 
-import org.checkerframework.checker.units.qual.C;
+
+import com.google.type.DateTime;
+
+import java.time.LocalDateTime;
 
 public class Comment {
-    private String commentId;
-    private String moveId;
+    private int commentId;
+    private LocalDateTime commentTime;
+    private int moveId;
     private String userAccount;
-    private String subCommentId;
     private String text;
 
-    public Comment(String commentId,String moveId,String userAccount,String subCommentId,String text)
-    {
+    public Comment(int commentId, LocalDateTime commentTime, int moveId, String userAccount, String text) {
         this.commentId = commentId;
+        this.commentTime = commentTime;
         this.moveId = moveId;
         this.userAccount = userAccount;
-        this.subCommentId = subCommentId;
         this.text = text;
     }
 
-    public Comment(String commentId,String moveId,String userAccount,String text)
-    {
-        this(commentId,moveId,userAccount,null,text);
+    public Comment(int commentId, String commentTimeString, int moveId, String userAccount, String text) {
+        this.commentId = commentId;
+        int yyyy = Integer.parseInt(commentTimeString.split(" ")[0].split("-")[0]);
+        int mm = Integer.parseInt(commentTimeString.split(" ")[0].split("-")[1]);
+        int dd = Integer.parseInt(commentTimeString.split(" ")[0].split("-")[2]);
+        int h = Integer.parseInt(commentTimeString.split(" ")[1].split(":")[0]);
+        int m = Integer.parseInt(commentTimeString.split(" ")[1].split(":")[1]);
+        int s = Integer.parseInt(commentTimeString.split(" ")[1].split(":")[2]);
+        this.commentTime = LocalDateTime.of(yyyy,mm,dd,h,m,s);
+        this.moveId = moveId;
+        this.userAccount = userAccount;
+        this.text = text;
     }
 
-    public String getCommentId() {
+    public Comment(int moveId, String userAccount, String text) {
+        this(-1, LocalDateTime.now(), moveId, userAccount, text);
+    }
+
+    public int getCommentId() {
         return commentId;
     }
 
-    public String getMoveId() {
+    public LocalDateTime getCommentTime() {
+        return commentTime;
+    }
+
+    public String getCommentTimeString() {
+        String basic = "%s-%s-%s %s:%s:%s";
+        return String.format(basic, commentTime.getYear(), commentTime.getMonthValue(), commentTime.getDayOfMonth(), commentTime.getHour(), commentTime.getMinute(), commentTime.getSecond());
+    }
+
+    public int getMoveId() {
         return moveId;
     }
 
     public String getUserAccount() {
         return userAccount;
-    }
-
-    public String getSubCommentId() {
-        return subCommentId;
     }
 
     public String getText() {

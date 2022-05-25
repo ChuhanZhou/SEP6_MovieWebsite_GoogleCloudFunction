@@ -6,6 +6,7 @@ import com.google.cloud.functions.HttpResponse;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,15 @@ public class UserAccountManagement implements HttpFunction {
 
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
+        httpResponse.appendHeader("Access-Control-Allow-Origin", "*");
+        if ("OPTIONS".equals(httpRequest.getMethod())) {
+            httpResponse.appendHeader("Access-Control-Allow-Methods", "GET");
+            httpResponse.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+            httpResponse.appendHeader("Access-Control-Max-Age", "3600");
+            httpResponse.setStatusCode(HttpURLConnection.HTTP_NO_CONTENT);
+            return;
+        }
+
         Map<String, List<String>> parameters = httpRequest.getQueryParameters();
 
         String path = httpRequest.getPath();

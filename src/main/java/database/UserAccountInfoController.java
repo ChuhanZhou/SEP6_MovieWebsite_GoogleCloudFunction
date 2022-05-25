@@ -54,7 +54,7 @@ public class UserAccountInfoController {
         Statement statement = connection.createStatement();
         String executeSQL = String.format(template,account);
         ResultSet result = statement.executeQuery(executeSQL);
-        return result.getFetchSize()>0;
+        return result.next();
     }
 
     public void updateUserAccount(String account, String password) throws SQLException

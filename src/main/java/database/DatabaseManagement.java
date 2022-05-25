@@ -11,6 +11,8 @@ public class DatabaseManagement {
     private static final String url_basic = "jdbc:mysql://%s:%s/%s?cloudSqlInstance=%s&socketFactory=%s&user=%s&password=%s";
     private final UserAccountInfoController userAccountInfoController;
     private final MovieInfoController movieInfoController;
+    private final MovieCommentController movieCommentController;
+    private final MovieLikeController movieLikeController;
 
     public DatabaseManagement() throws SQLException, ClassNotFoundException, IOException {
         Class.forName("com.mysql.jdbc.Driver");
@@ -18,6 +20,8 @@ public class DatabaseManagement {
 
         userAccountInfoController = new UserAccountInfoController(url_basic);
         movieInfoController = new MovieInfoController(url_basic);
+        movieCommentController = new MovieCommentController(url_basic);
+        movieLikeController = new MovieLikeController(url_basic);
     }
 
     public UserAccountInfoController getUserAccountInfoController() {
@@ -26,5 +30,13 @@ public class DatabaseManagement {
 
     public MovieInfoController getMovieInfoController() {
         return movieInfoController;
+    }
+
+    public MovieCommentController getMovieCommentController() {
+        return movieCommentController;
+    }
+
+    public MovieLikeController getMovieLikeController() {
+        return movieLikeController;
     }
 }
