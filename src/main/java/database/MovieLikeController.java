@@ -30,20 +30,19 @@ public class MovieLikeController {
         statement.execute(executeSQL);
     }
 
-    public void addLike(String userAccount,int movieId) throws SQLException {
+    public void addLike(String userAccount, int movieId) throws SQLException {
         String template = "insert into `MovieLike` (id,userAccount,movieId) values (\"%s\",\"%s\",\"%s\");";
-        if (!isLike(userAccount, movieId))
-        {
+        if (!isLike(userAccount, movieId)) {
             Statement statement = connection.createStatement();
-            String executeSQL = String.format(template, userAccount+"_"+movieId,userAccount,movieId);
+            String executeSQL = String.format(template, userAccount + "_" + movieId, userAccount, movieId);
             statement.executeUpdate(executeSQL);
         }
     }
 
-    public boolean isLike(String userAccount,int movieId) throws SQLException {
+    public boolean isLike(String userAccount, int movieId) throws SQLException {
         String template = "select id from `MovieLike` where `id` = \"%s\";";
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template, userAccount+"_"+movieId);
+        String executeSQL = String.format(template, userAccount + "_" + movieId);
         ResultSet result = statement.executeQuery(executeSQL);
         return result.next();
     }
@@ -54,7 +53,7 @@ public class MovieLikeController {
         Statement statement = connection.createStatement();
         String executeSQL = String.format(template, movieId);
         ResultSet result = statement.executeQuery(executeSQL);
-        while (result.next()){
+        while (result.next()) {
             numOfLike++;
         }
         return numOfLike;
@@ -66,16 +65,23 @@ public class MovieLikeController {
         Statement statement = connection.createStatement();
         String executeSQL = String.format(template, account);
         ResultSet result = statement.executeQuery(executeSQL);
-        while (result.next()){
+        while (result.next()) {
             moviesIdList.add(result.getInt("movieId"));
         }
         return moviesIdList;
     }
 
-    public void removeLike(String userAccount,int movieId) throws SQLException {
+    public void removeLike(String userAccount, int movieId) throws SQLException {
         String template = "delete from `MovieLike` where `id` = \"%s\";";
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template, userAccount+"_"+movieId);
+        String executeSQL = String.format(template, userAccount + "_" + movieId);
+        statement.executeUpdate(executeSQL);
+    }
+
+    public void removeLikeByUser(String userAccount) throws SQLException {
+        String template = "delete from `MovieLike` where `userAccount` = \"%s\";";
+        Statement statement = connection.createStatement();
+        String executeSQL = String.format(template, userAccount);
         statement.executeUpdate(executeSQL);
     }
 }

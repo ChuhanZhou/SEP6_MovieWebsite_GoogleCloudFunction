@@ -85,7 +85,7 @@
                 <artifactId>function-maven-plugin</artifactId>
                 <version>0.10.0</version>
                 <configuration>
-                    <functionTarget>functions.MovieInfoManagement</functionTarget>
+                    <functionTarget>functions.KeyWordSearch</functionTarget>
                 </configuration>
             </plugin>
         </plugins>

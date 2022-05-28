@@ -14,17 +14,24 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import database.DatabaseManagement;
+import database.MovieCommentController;
+import database.MovieLikeController;
 import database.UserAccountInfoController;
 import model.User;
 
 public class UserAccountManagement implements HttpFunction {
 
     private static final Gson gson = new Gson();
-    private static String[] parameterList = {"Account", "Password","NewPassword"};
-    private static UserAccountInfoController database;
+    private static String[] parameterList = {"Account", "Password", "NewPassword"};
+    private static UserAccountInfoController accountDatabase;
+    private static MovieCommentController commentDatabase;
+    private static MovieLikeController likeDatabase;
 
     public UserAccountManagement() throws SQLException, ClassNotFoundException, IOException {
-        database = new DatabaseManagement().getUserAccountInfoController();
+        DatabaseManagement databaseManagement = new DatabaseManagement();
+        accountDatabase = databaseManagement.getUserAccountInfoController();
+        commentDatabase = databaseManagement.getMovieCommentController();
+        likeDatabase = databaseManagement.getMovieLikeController();
     }
 
     @Override
@@ -74,7 +81,7 @@ public class UserAccountManagement implements HttpFunction {
                     }
                     break;
                 case "changePassword":
-                    parameterList = getParameters(parameters, new int[]{0, 1,2});
+                    parameterList = getParameters(parameters, new int[]{0, 1, 2});
                     backInfo = (String) parameterList[0];
                     if (backInfo == null) {
                         ArrayList<List<String>> pList = (ArrayList<List<String>>) parameterList[1];
@@ -130,15 +137,15 @@ public class UserAccountManagement implements HttpFunction {
 
     private String register(String newAccount, String newPassword) throws SQLException {
         String backInfo = "The account [" + newAccount + "] has been used!";
-        if (!database.hasUserAccount(newAccount)) {
-            database.createNewUser(newAccount, newPassword);
+        if (!accountDatabase.hasUserAccount(newAccount)) {
+            accountDatabase.createNewUser(newAccount, newPassword);
             backInfo = "OK";
         }
         return backInfo;
     }
 
     private String login(String account, String password) throws SQLException {
-        User user = database.getUserAccountInfo(account);
+        User user = accountDatabase.getUserAccountInfo(account);
         if (user != null && user.checkPassword(password)) {
             return "OK";
         }
@@ -146,18 +153,20 @@ public class UserAccountManagement implements HttpFunction {
     }
 
     private String changePassword(String account, String oldPassword, String newPassword) throws SQLException {
-        User user = database.getUserAccountInfo(account);
+        User user = accountDatabase.getUserAccountInfo(account);
         if (user != null && user.checkPassword(oldPassword)) {
-            database.updateUserAccount(account,newPassword);
+            accountDatabase.updateUserAccount(account, newPassword);
             return "OK";
         }
         return "Wrong account or password!";
     }
 
     private String logOff(String account, String password) throws SQLException {
-        User user = database.getUserAccountInfo(account);
+        User user = accountDatabase.getUserAccountInfo(account);
         if (user != null && user.checkPassword(password)) {
-            database.deleteUserAccount(account);
+            commentDatabase.deleteCommentByUser(account);
+            likeDatabase.removeLikeByUser(account);
+            accountDatabase.deleteUserAccount(account);
             return "OK";
         }
         return "Wrong account or password!";

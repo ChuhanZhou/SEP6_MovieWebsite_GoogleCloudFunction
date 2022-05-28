@@ -18,16 +18,8 @@ public class Main {
         MovieCommentController movieCommentController = databaseManagement.getMovieCommentController();
         MovieLikeController movieLikeController = databaseManagement.getMovieLikeController();
         Gson gson = new Gson();
-        int[] a = new int[]{0,99};
-        //Comment comment = new Comment(15414,"1","test text 1");
-        //Comment comment1 = movieCommentController.addComment(comment);
-        //System.out.println(gson.toJson(comment1));
-        //movieLikeController.addLike("1",36606);
-        //ArrayList<Movie> movies = movieInfoController.getMoviesInfoByIds(movieLikeController.getMoviesIdOfLikeByUser("1"));
-        //int b=1;
-
-        //String result = gson.toJson(movieInfoController.getMoviesByKeyword("","","Nesli",a));
-        //String result = gson.toJson(movieInfoController.getMoviesByKeyword("ewe","","",a,"or"));
-        //System.out.println(result);
+        int[] a = new int[]{0,10};
+        ArrayList<int[]> list = movieCommentController.getMovieIdByCommentNumber(a);
+        System.out.println(gson.toJson(list));
     }
 }

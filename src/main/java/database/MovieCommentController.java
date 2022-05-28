@@ -6,6 +6,7 @@ import model.User;
 import org.checkerframework.checker.units.qual.C;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class MovieCommentController {
     private static final String db_ip = "34.65.255.129";
@@ -47,8 +48,25 @@ public class MovieCommentController {
         return null;
     }
 
+    public ArrayList<int[]> getMovieIdByCommentNumber(int[] limit) throws SQLException {
+        ArrayList<int[]> movieIdList = new ArrayList<>();
+        String template = "select movieId,sum(1) as \"num\" from `MovieComment` " +
+                "group by movieId " +
+                "order by num desc " +
+                "limit %s,%s;";
+        Statement statement = connection.createStatement();
+        String executeSQL = String.format(template, limit[0], limit[1]);
+        ResultSet result = statement.executeQuery(executeSQL);
+        while (result.next()) {
+            int[] info = new int[]{result.getInt("movieId"), result.getInt("num")};
+            movieIdList.add(info);
+        }
+        return movieIdList;
+    }
+
     public Comment getCommentById(int id) throws SQLException {
-        String template = "select * from `MovieComment` where `id` = \"%s\";";
+        String template = "select * from `MovieComment` " +
+                "where `id` = \"%s\";";
         Statement statement = connection.createStatement();
         String executeSQL = String.format(template, id);
         ResultSet result = statement.executeQuery(executeSQL);
@@ -57,15 +75,16 @@ public class MovieCommentController {
             int movieId = result.getInt("movieId");
             String time = result.getString("time");
             String text = result.getString("text");
-            return new Comment(id,time,movieId,userAccount,text);
+            return new Comment(id, time, movieId, userAccount, text);
         }
         return null;
     }
 
-    public CommentList getCommentsByUser(String account,int[] limit) throws SQLException {
+    public CommentList getCommentsByUser(String account, int[] limit) throws SQLException {
         CommentList commentList = new CommentList();
         String template = "select * from `MovieComment` " +
                 "where `userAccount` = \"%s\" " +
+                "order by time desc " +
                 "limit %s,%s;";
         Statement statement = connection.createStatement();
         String executeSQL = String.format(template, account, limit[0], limit[1]);
@@ -75,15 +94,16 @@ public class MovieCommentController {
             int movieId = result.getInt("movieId");
             String time = result.getString("time");
             String text = result.getString("text");
-            commentList.add(new Comment(id,time,movieId,account,text));
+            commentList.add(new Comment(id, time, movieId, account, text));
         }
         return commentList;
     }
 
-    public CommentList getCommentsByMovie(int movieId,int[] limit) throws SQLException {
+    public CommentList getCommentsByMovie(int movieId, int[] limit) throws SQLException {
         CommentList commentList = new CommentList();
         String template = "select * from `MovieComment` " +
                 "where `movieId` = \"%s\" " +
+                "order by time desc " +
                 "limit %s,%s;";
         Statement statement = connection.createStatement();
         String executeSQL = String.format(template, movieId, limit[0], limit[1]);
@@ -93,22 +113,22 @@ public class MovieCommentController {
             String account = result.getString("userAccount");
             String time = result.getString("time");
             String text = result.getString("text");
-            commentList.add(new Comment(id,time,movieId,account,text));
+            commentList.add(new Comment(id, time, movieId, account, text));
         }
         return commentList;
     }
 
-    public CommentList getCommentsByUserMovieTime(String account,int movieId,String time) throws SQLException {
+    public CommentList getCommentsByUserMovieTime(String account, int movieId, String time) throws SQLException {
         CommentList commentList = new CommentList();
         String template = "select * from `MovieComment` " +
                 "where `userAccount` = \"%s\" and `movieId` = \"%s\" and `time` = \"%s\";";
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template, account,movieId,time);
+        String executeSQL = String.format(template, account, movieId, time);
         ResultSet result = statement.executeQuery(executeSQL);
         while (result.next()) {
             int id = result.getInt("id");
             String text = result.getString("text");
-            commentList.add(new Comment(id,time,movieId,account,text));
+            commentList.add(new Comment(id, time, movieId, account, text));
         }
         return commentList;
     }
@@ -117,6 +137,13 @@ public class MovieCommentController {
         String template = "delete from `MovieComment` where `id` = \"%s\";";
         Statement statement = connection.createStatement();
         String executeSQL = String.format(template, id);
+        statement.executeUpdate(executeSQL);
+    }
+
+    public void deleteCommentByUser(String account) throws SQLException {
+        String template = "delete from `MovieComment` where `userAccount` = \"%s\";";
+        Statement statement = connection.createStatement();
+        String executeSQL = String.format(template, account);
         statement.executeUpdate(executeSQL);
     }
 }

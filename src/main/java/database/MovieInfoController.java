@@ -24,7 +24,7 @@ public class MovieInfoController {
         this.connection = DriverManager.getConnection(url);
     }
 
-    public Movie getMovieInfoById(int id) throws SQLException {
+    public Movie getAllMovieInfoById(int id) throws SQLException {
         String template = "select * from `movies` " +
                 "inner join `ratings` on `movies`.id=`ratings`.movie_id " +
                 "where `id` = \"%s\";";
@@ -42,7 +42,28 @@ public class MovieInfoController {
             ArrayList<People> stars = getStarsByMovieId(id);
             ArrayList<People> directors = getDirectorsByMovieId(id);
 
-            movie = new Movie(movieId, title, year,directors,stars,rating,votes);
+            movie = new Movie(movieId, title, year, directors, stars, rating, votes);
+        }
+
+        return movie;
+    }
+
+    public Movie getMovieInfoById(int id) throws SQLException {
+        String template = "select * from `movies` " +
+                "inner join `ratings` on `movies`.id=`ratings`.movie_id " +
+                "where `id` = \"%s\";";
+        Movie movie = null;
+        Statement statement = connection.createStatement();
+        String executeSQL = String.format(template, id);
+        ResultSet result = statement.executeQuery(executeSQL);
+        while (result.next()) {
+            int movieId = result.getInt("id");
+            String title = result.getString("title");
+            int year = result.getInt("year");
+            double rating = result.getDouble("rating");
+            int votes = result.getInt("votes");
+
+            movie = new Movie(movieId, title, year, rating, votes);
         }
 
         return movie;
@@ -55,7 +76,7 @@ public class MovieInfoController {
         ArrayList<Movie> movies = new ArrayList<>();
         Statement statement = connection.createStatement();
         String idsString = ids.toString().split("]")[0].split("\\[")[1];
-        String executeSQL = String.format(template,idsString);
+        String executeSQL = String.format(template, idsString);
         ResultSet result = statement.executeQuery(executeSQL);
         while (result.next()) {
             int movieId = result.getInt("id");
@@ -63,15 +84,22 @@ public class MovieInfoController {
             int year = result.getInt("year");
             double rating = result.getDouble("rating");
             int votes = result.getInt("votes");
-            movies.add(new Movie(movieId, title, year,rating,votes));
+            movies.add(new Movie(movieId, title, year, rating, votes));
         }
         return movies;
     }
 
-    public ArrayList<Movie> getMoviesByKeyword(String title, String starName,String directorName, int[] limit,String logicKey) throws SQLException {
-        if (logicKey==null||!logicKey.equals("or"))
-        {
+    public ArrayList<Movie> getMoviesByKeyword(String title, String starName, String directorName, int[] limit, String logicKey, String orderKey) throws SQLException {
+        if (logicKey == null || !logicKey.equals("or")) {
             logicKey = "and";
+        }
+        switch (orderKey) {
+            case "rating":
+            case "year":
+                break;
+            default:
+                orderKey = "rating";
+                break;
         }
         String template = "select movies.id,title,year,rating,votes from `movies`" +
                 "inner join `stars` on `movies`.id=`stars`.movie_id " +
@@ -81,11 +109,11 @@ public class MovieInfoController {
                 "inner join `ratings` on `movies`.id=`ratings`.movie_id " +
                 "where `title` like \"%s\" %s p1.`name` like \"%s\" %s p2.`name` like \"%s\" " +
                 "group by movies.id " +
-                "order by rating desc " +
+                "order by %s desc " +
                 "limit %s,%s;";
         ArrayList<Movie> movies = new ArrayList<>();
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template, "%"+title+"%",logicKey, "%" + starName+"%", logicKey,"%" + directorName+"%", limit[0], limit[1]);
+        String executeSQL = String.format(template, "%" + title + "%", logicKey, "%" + starName + "%", logicKey, "%" + directorName + "%", orderKey, limit[0], limit[1]);
         ResultSet result = statement.executeQuery(executeSQL);
         while (result.next()) {
             int movieId = result.getInt("movies.id");
@@ -93,7 +121,7 @@ public class MovieInfoController {
             int year = result.getInt("year");
             double rating = result.getDouble("rating");
             int votes = result.getInt("votes");
-            movies.add(new Movie(movieId, title, year,rating,votes));
+            movies.add(new Movie(movieId, title, year, rating, votes));
         }
         return movies;
     }
@@ -115,7 +143,7 @@ public class MovieInfoController {
             int year = result.getInt("year");
             double rating = result.getDouble("rating");
             int votes = result.getInt("votes");
-            movies.add(new Movie(movieId, title, year,rating,votes));
+            movies.add(new Movie(movieId, title, year, rating, votes));
         }
         return movies;
     }
@@ -137,7 +165,7 @@ public class MovieInfoController {
             int year = result.getInt("year");
             double rating = result.getDouble("rating");
             int votes = result.getInt("votes");
-            movies.add(new Movie(movieId, title, year,rating,votes));
+            movies.add(new Movie(movieId, title, year, rating, votes));
         }
         return movies;
     }
@@ -154,7 +182,7 @@ public class MovieInfoController {
         while (result.next()) {
             String name = result.getString("name");
             int birth = result.getInt("birth");
-            star = new People(id,name,birth);
+            star = new People(id, name, birth);
         }
         return star;
     }
@@ -166,13 +194,13 @@ public class MovieInfoController {
                 "group by people.id limit %s,%s;";
         ArrayList<People> stars = new ArrayList<>();
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template, "%" + keyword+"%", limit[0], limit[1]);
+        String executeSQL = String.format(template, "%" + keyword + "%", limit[0], limit[1]);
         ResultSet result = statement.executeQuery(executeSQL);
         while (result.next()) {
             int id = result.getInt("people.id");
             String name = result.getString("name");
             int birth = result.getInt("birth");
-            stars.add(new People(id,name,birth));
+            stars.add(new People(id, name, birth));
         }
         return stars;
     }
@@ -190,7 +218,7 @@ public class MovieInfoController {
             int id = result.getInt("person_id");
             String name = result.getString("name");
             int birth = result.getInt("birth");
-            stars.add(new People(id,name,birth));
+            stars.add(new People(id, name, birth));
         }
         return stars;
     }
@@ -207,7 +235,7 @@ public class MovieInfoController {
         while (result.next()) {
             String name = result.getString("name");
             int birth = result.getInt("birth");
-            star = new People(id,name,birth);
+            star = new People(id, name, birth);
         }
         return star;
     }
@@ -219,13 +247,13 @@ public class MovieInfoController {
                 "group by people.id limit %s,%s;";
         ArrayList<People> directors = new ArrayList<>();
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template, "%" + keyword+"%", limit[0], limit[1]);
+        String executeSQL = String.format(template, "%" + keyword + "%", limit[0], limit[1]);
         ResultSet result = statement.executeQuery(executeSQL);
         while (result.next()) {
             int id = result.getInt("people.id");
             String name = result.getString("name");
             int birth = result.getInt("birth");
-            directors.add(new People(id,name,birth));
+            directors.add(new People(id, name, birth));
         }
         return directors;
     }
@@ -243,7 +271,7 @@ public class MovieInfoController {
             int id = result.getInt("person_id");
             String name = result.getString("name");
             int birth = result.getInt("birth");
-            directors.add(new People(id,name,birth));
+            directors.add(new People(id, name, birth));
         }
         return directors;
     }

@@ -12,6 +12,7 @@ import database.MovieLikeController;
 import model.CommentList;
 import model.Movie;
 import model.People;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 public class KeyWordSearch implements HttpFunction {
     private static final Gson gson = new Gson();
-    private static String[] parameterList = {"Title", "StarName", "DirectorName", "Limit", "Id", "LogicKey"};
+    private static String[] parameterList = {"Title", "StarName", "DirectorName", "Limit", "Id", "LogicKey", "OrderKey"};
     private static MovieInfoController infoDatabase;
     private static MovieCommentController commentDatabase;
     private static MovieLikeController likeDatabase;
@@ -52,7 +53,7 @@ public class KeyWordSearch implements HttpFunction {
         String[] pathList = path.split("/");
         String backInfo = "Path Function List:" +
                 "\n[./moviesByKeyword]:" +
-                "\n    parameters:[" + parameterList[0] + "],[" + parameterList[1] + "],[" + parameterList[2] + "],[" + parameterList[3] + "],[" + parameterList[5] + "]" +
+                "\n    parameters:[" + parameterList[0] + "],[" + parameterList[1] + "],[" + parameterList[2] + "],[" + parameterList[3] + "],[" + parameterList[5] + "],[" + parameterList[6] + "]" +
                 "\n[./starsMovies]:" +
                 "\n    parameters:[" + parameterList[1] + "],[" + parameterList[3] + "]" +
                 "\n[./starMovies]:" +
@@ -63,6 +64,8 @@ public class KeyWordSearch implements HttpFunction {
                 "\n    parameters:[" + parameterList[4] + "],[" + parameterList[3] + "]" +
                 "\n[./movieInfo]:" +
                 "\n    parameters:[" + parameterList[4] + "],[" + parameterList[3] + "]" +
+                "\n[./moviesByCommentNum]:" +
+                "\n    parameters:[" + parameterList[3] + "]" +
                 "\n\nUrl info:\n" +
                 getUrlInfo(httpRequest);
 
@@ -70,12 +73,12 @@ public class KeyWordSearch implements HttpFunction {
             Object[] parameterList = null;
             switch (pathList[1]) {
                 case "moviesByKeyword":
-                    parameterList = getParameters(parameters, new int[]{0, 1, 2, 3, 5}, false);
+                    parameterList = getParameters(parameters, new int[]{0, 1, 2, 3, 5, 6}, false);
                     backInfo = (String) parameterList[0];
                     if (parameterList[0] == null) {
                         ArrayList<String> pList = (ArrayList<String>) parameterList[1];
                         try {
-                            backInfo = searchMovie(pList.get(0), pList.get(1), pList.get(2), gson.fromJson(pList.get(3), int[].class), pList.get(4));
+                            backInfo = searchMovie(pList.get(0), pList.get(1), pList.get(2), gson.fromJson(pList.get(3), int[].class), pList.get(4), pList.get(5));
                         } catch (JsonSyntaxException e) {
                             backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
                         }
@@ -133,9 +136,17 @@ public class KeyWordSearch implements HttpFunction {
                     parameterList = getParameters(parameters, new int[]{4}, true);
                     backInfo = (String) parameterList[0];
                     if (parameterList[0] == null) {
-                        parameterList = getParameters(parameters, new int[]{4,3}, false);
+                        parameterList = getParameters(parameters, new int[]{4, 3}, false);
                         ArrayList<String> pList = (ArrayList<String>) parameterList[1];
-                        backInfo = getMovieInfo(Integer.parseInt(pList.get(0)),gson.fromJson(pList.get(1), int[].class));
+                        backInfo = getMovieInfo(Integer.parseInt(pList.get(0)), gson.fromJson(pList.get(1), int[].class));
+                    }
+                    break;
+                case "moviesByCommentNum":
+                    parameterList = getParameters(parameters, new int[]{3}, true);
+                    backInfo = (String) parameterList[0];
+                    if (parameterList[0] == null) {
+                        ArrayList<String> pList = (ArrayList<String>) parameterList[1];
+                        backInfo = getMoviesByCommentNum(gson.fromJson(pList.get(0), int[].class));
                     }
                     break;
                 default:
@@ -197,7 +208,7 @@ public class KeyWordSearch implements HttpFunction {
         return new Object[]{info, pList};
     }
 
-    private String searchMovie(String title, String starName, String directorName, int[] limit, String logicKey) throws SQLException {
+    private String searchMovie(String title, String starName, String directorName, int[] limit, String logicKey, String orderKey) throws SQLException {
         if (title == null) {
             title = "";
         }
@@ -212,7 +223,7 @@ public class KeyWordSearch implements HttpFunction {
         } else {
             limit[1] = limit[1] - limit[0];
         }
-        ArrayList<Movie> movies = infoDatabase.getMoviesByKeyword(title, starName, directorName, limit, logicKey);
+        ArrayList<Movie> movies = infoDatabase.getMoviesByKeyword(title, starName, directorName, limit, logicKey, orderKey);
         return gson.toJson(movies);
     }
 
@@ -280,15 +291,30 @@ public class KeyWordSearch implements HttpFunction {
         } else {
             limit[1] = limit[1] - limit[0];
         }
-        Movie movie = infoDatabase.getMovieInfoById(id);
+        Movie movie = infoDatabase.getAllMovieInfoById(id);
         String backInfo = "Can't find Movie by [id] " + id;
         if (movie != null) {
-            CommentList commentList = commentDatabase.getCommentsByMovie(id,limit);
+            CommentList commentList = commentDatabase.getCommentsByMovie(id, limit);
             movie.setCommentList(commentList);
             int numOfLike = likeDatabase.getNumberOfLikeByMovie(id);
             movie.setLikes(numOfLike);
             backInfo = gson.toJson(movie);
         }
         return backInfo;
+    }
+
+    public String getMoviesByCommentNum(int[] limit) throws SQLException {
+        if (limit == null || limit.length != 2) {
+            limit = new int[]{0, 100};
+        } else {
+            limit[1] = limit[1] - limit[0];
+        }
+        ArrayList<int[]> list = commentDatabase.getMovieIdByCommentNumber(limit);
+        ArrayList<Movie> movieList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            int movieId = list.get(i)[0];
+            movieList.add(infoDatabase.getMovieInfoById(movieId));
+        }
+        return gson.toJson(movieList);
     }
 }

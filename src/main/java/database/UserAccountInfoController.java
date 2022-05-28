@@ -16,7 +16,7 @@ public class UserAccountInfoController {
     private final Connection connection;
 
     public UserAccountInfoController(String url_basic) throws SQLException {
-        String url = String.format(url_basic,db_ip,db_post,db_name,db_cloudSqlInstance,db_socketFactory,db_user,db_password);
+        String url = String.format(url_basic, db_ip, db_post, db_name, db_cloudSqlInstance, db_socketFactory, db_user, db_password);
         this.connection = DriverManager.getConnection(url);
     }
 
@@ -33,14 +33,14 @@ public class UserAccountInfoController {
     public void createNewUser(String account, String password) throws SQLException {
         String template = "insert into `UserAccountInfo` (Account,Password) values (\"%s\",\"%s\");";
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template,account,password);
+        String executeSQL = String.format(template, account, password);
         statement.executeUpdate(executeSQL);
     }
 
     public User getUserAccountInfo(String account) throws SQLException {
         String template = "select * from `UserAccountInfo` where `Account` = \"%s\";";
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template,account);
+        String executeSQL = String.format(template, account);
         ResultSet result = statement.executeQuery(executeSQL);
         if (result.next()) {
             String password = result.getString("Password");
@@ -52,24 +52,22 @@ public class UserAccountInfoController {
     public boolean hasUserAccount(String account) throws SQLException {
         String template = "select `Account` from `UserAccountInfo` where `Account` = \"%s\";";
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template,account);
+        String executeSQL = String.format(template, account);
         ResultSet result = statement.executeQuery(executeSQL);
         return result.next();
     }
 
-    public void updateUserAccount(String account, String password) throws SQLException
-    {
+    public void updateUserAccount(String account, String password) throws SQLException {
         String template = "update `UserAccountInfo` set `Password` = \"%s\" where `Account` = \"%s\";";
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template,password,account);
+        String executeSQL = String.format(template, password, account);
         statement.executeUpdate(executeSQL);
     }
 
-    public void deleteUserAccount(String account) throws SQLException
-    {
+    public void deleteUserAccount(String account) throws SQLException {
         String template = "delete from `UserAccountInfo` where `Account` = \"%s\";";
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template,account);
+        String executeSQL = String.format(template, account);
         statement.executeUpdate(executeSQL);
     }
 }
