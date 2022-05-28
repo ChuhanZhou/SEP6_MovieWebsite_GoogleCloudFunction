@@ -93,9 +93,14 @@ public class MovieInfoController {
         if (logicKey == null || !logicKey.equals("or")) {
             logicKey = "and";
         }
+        if (orderKey==null)
+        {
+            orderKey = "rating";
+        }
         switch (orderKey) {
             case "rating":
             case "year":
+            case "votes":
                 break;
             default:
                 orderKey = "rating";
