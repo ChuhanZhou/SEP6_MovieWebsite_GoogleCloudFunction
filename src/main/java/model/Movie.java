@@ -4,7 +4,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 
 public class Movie {
-    private int moveId;
+    private int movieId;
     private String title;
     private int year;
     private ArrayList<People> directors;
@@ -15,8 +15,8 @@ public class Movie {
     private int likes;
     private CommentList commentList;
 
-    public Movie(int moveId, String title, int year, ArrayList<People> directors, ArrayList<People> stars, double rating, int votes, int likes, CommentList commentList) {
-        this.moveId = moveId;
+    public Movie(int movieId, String title, int year, ArrayList<People> directors, ArrayList<People> stars, double rating, int votes, int likes, CommentList commentList) {
+        this.movieId = movieId;
         this.title = title;
         this.year = year;
         this.directors = directors;
@@ -27,23 +27,23 @@ public class Movie {
         this.commentList = commentList;
     }
 
-    public Movie(int moveId, String title, int year, ArrayList<People> directors, ArrayList<People> stars, double rating, int votes)
+    public Movie(int movieId, String title, int year, ArrayList<People> directors, ArrayList<People> stars, double rating, int votes)
     {
-        this(moveId,title,year,directors,stars,rating,votes,-1,null);
+        this(movieId,title,year,directors,stars,rating,votes,-1,null);
     }
 
-    public Movie(int moveId, String title, int year, double rating, int votes)
+    public Movie(int movieId, String title, int year, double rating, int votes)
     {
-        this(moveId,title,year,null,null,rating,votes);
+        this(movieId,title,year,null,null,rating,votes);
     }
 
-    public Movie(int moveId, String title, int year)
+    public Movie(int movieId, String title, int year)
     {
-        this(moveId,title,year,-1,-1);
+        this(movieId,title,year,-1,-1);
     }
 
-    public int getMoveId() {
-        return moveId;
+    public int getMovieId() {
+        return movieId;
     }
 
     public String getTitle() {

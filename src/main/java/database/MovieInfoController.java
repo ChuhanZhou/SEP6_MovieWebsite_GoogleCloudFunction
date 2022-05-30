@@ -93,8 +93,7 @@ public class MovieInfoController {
         if (logicKey == null || !logicKey.equals("or")) {
             logicKey = "and";
         }
-        if (orderKey==null)
-        {
+        if (orderKey == null) {
             orderKey = "rating";
         }
         switch (orderKey) {
@@ -106,20 +105,46 @@ public class MovieInfoController {
                 orderKey = "rating";
                 break;
         }
+        ArrayList<String> requirements = new ArrayList<>();
+        String joinSQL = "";
+
+        if (title != null && !title.equals("")) {
+            String titleSearch = "`title` like \"%s\"";
+            requirements.add(String.format(titleSearch, "%" + title + "%"));
+        }
+        if (starName != null && !starName.equals("")) {
+            String starSearch = "p1.`name` like \"%s\"";
+            requirements.add(String.format(starSearch, "%" + starName + "%"));
+            joinSQL += "inner join `stars` on `movies`.id=`stars`.movie_id " +
+                    "inner join `people` as p1 on `stars`.person_id=`p1`.id ";
+        }
+        if (directorName != null && !directorName.equals("")) {
+            String directorSearch = "p2.`name` like \"%s\"";
+            requirements.add(String.format(directorSearch, "%" + directorName + "%"));
+            joinSQL += "inner join `directors` on `movies`.id=`directors`.movie_id " +
+                    "inner join `people` as p2 on `directors`.person_id=`p2`.id ";
+        }
+
+        String keywordSQL = "";
+        if (requirements.size() > 0) {
+            keywordSQL = String.format("where %s ", requirements.get(0));
+        }
+        for (int i = 1; i < requirements.size(); i++) {
+            keywordSQL += String.format("%s %s ", logicKey, requirements.get(i));
+        }
+
         String template = "select movies.id,title,year,rating,votes from `movies`" +
-                "inner join `stars` on `movies`.id=`stars`.movie_id " +
-                "inner join `people` as p1 on `stars`.person_id=`p1`.id " +
-                "inner join `directors` on `movies`.id=`directors`.movie_id " +
-                "inner join `people` as p2 on `directors`.person_id=`p2`.id " +
+                "%s" +
                 "inner join `ratings` on `movies`.id=`ratings`.movie_id " +
-                "where `title` like \"%s\" %s p1.`name` like \"%s\" %s p2.`name` like \"%s\" " +
+                "%s" +
                 "group by movies.id " +
                 "order by %s desc " +
                 "limit %s,%s;";
         ArrayList<Movie> movies = new ArrayList<>();
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template, "%" + title + "%", logicKey, "%" + starName + "%", logicKey, "%" + directorName + "%", orderKey, limit[0], limit[1]);
+        String executeSQL = String.format(template, joinSQL,keywordSQL, orderKey, limit[0], limit[1]);
         ResultSet result = statement.executeQuery(executeSQL);
+        System.out.println(executeSQL);
         while (result.next()) {
             int movieId = result.getInt("movies.id");
             title = result.getString("title");
