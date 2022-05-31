@@ -84,7 +84,8 @@ public class MovieInfoManagement implements HttpFunction {
                         try {
                             backInfo = addComment(pList.get(0), pList.get(1), Integer.parseInt(pList.get(2)), pList.get(3));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -97,7 +98,8 @@ public class MovieInfoManagement implements HttpFunction {
                         try {
                             backInfo = getCommentsByUser(pList.get(0), gson.fromJson(pList.get(1), int[].class));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -110,7 +112,8 @@ public class MovieInfoManagement implements HttpFunction {
                         try {
                             backInfo = getCommentsByMovie(Integer.parseInt(pList.get(0)), gson.fromJson(pList.get(1), int[].class));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -122,7 +125,8 @@ public class MovieInfoManagement implements HttpFunction {
                         try {
                             backInfo = removeComment(pList.get(0), pList.get(1), Integer.parseInt(pList.get(2)));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -134,7 +138,8 @@ public class MovieInfoManagement implements HttpFunction {
                         try {
                             backInfo = changeLikeStatus(pList.get(0), pList.get(1), Integer.parseInt(pList.get(2)));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -146,7 +151,8 @@ public class MovieInfoManagement implements HttpFunction {
                         try {
                             backInfo = isLike(pList.get(0), pList.get(1), Integer.parseInt(pList.get(2)));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -159,7 +165,8 @@ public class MovieInfoManagement implements HttpFunction {
                         try {
                             backInfo = getLikeMovies(pList.get(0), pList.get(1), gson.fromJson(pList.get(2), int[].class));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -171,7 +178,8 @@ public class MovieInfoManagement implements HttpFunction {
                         try {
                             backInfo = getLikeNum(Integer.parseInt(pList.get(0)));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;

@@ -74,17 +74,20 @@ public class MovieInfoController {
                 "inner join `ratings` on `movies`.id=`ratings`.movie_id " +
                 "where `id` in (%s);";
         ArrayList<Movie> movies = new ArrayList<>();
-        Statement statement = connection.createStatement();
-        String idsString = ids.toString().split("]")[0].split("\\[")[1];
-        String executeSQL = String.format(template, idsString);
-        ResultSet result = statement.executeQuery(executeSQL);
-        while (result.next()) {
-            int movieId = result.getInt("id");
-            String title = result.getString("title");
-            int year = result.getInt("year");
-            double rating = result.getDouble("rating");
-            int votes = result.getInt("votes");
-            movies.add(new Movie(movieId, title, year, rating, votes));
+        if (ids.size()!=0)
+        {
+            Statement statement = connection.createStatement();
+            String idsString = ids.toString().split("]")[0].split("\\[")[1];
+            String executeSQL = String.format(template, idsString);
+            ResultSet result = statement.executeQuery(executeSQL);
+            while (result.next()) {
+                int movieId = result.getInt("id");
+                String title = result.getString("title");
+                int year = result.getInt("year");
+                double rating = result.getDouble("rating");
+                int votes = result.getInt("votes");
+                movies.add(new Movie(movieId, title, year, rating, votes));
+            }
         }
         return movies;
     }
@@ -203,7 +206,7 @@ public class MovieInfoController {
     public People getStarById(int id) throws SQLException {
         String template = "select people.id,name,birth from `people` " +
                 "inner join `stars` on `people`.id=`stars`.person_id " +
-                "where `person_id` = \"%s\" " +
+                "where `people`.id = \"%s\" " +
                 "group by people.id;";
         People star = null;
         Statement statement = connection.createStatement();
@@ -255,8 +258,8 @@ public class MovieInfoController {
 
     public People getDirectorById(int id) throws SQLException {
         String template = "select people.id,name,birth from `people` " +
-                "inner join `directors` on `people`.id=`stars`.person_id " +
-                "where `person_id` = \"%s\" " +
+                "inner join `directors` on `people`.id=`directors`.person_id " +
+                "where `people`.id = \"%s\" " +
                 "group by people.id;";
         People star = null;
         Statement statement = connection.createStatement();

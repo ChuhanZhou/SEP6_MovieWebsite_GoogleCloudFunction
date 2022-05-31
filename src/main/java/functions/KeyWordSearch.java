@@ -80,7 +80,8 @@ public class KeyWordSearch implements HttpFunction {
                         try {
                             backInfo = searchMovie(pList.get(0), pList.get(1), pList.get(2), gson.fromJson(pList.get(3), int[].class), pList.get(4), pList.get(5));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -92,7 +93,8 @@ public class KeyWordSearch implements HttpFunction {
                         try {
                             backInfo = getStarsMovies(pList.get(0), gson.fromJson(pList.get(1), int[].class));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -104,7 +106,8 @@ public class KeyWordSearch implements HttpFunction {
                         try {
                             backInfo = getStarMovies(Integer.parseInt(pList.get(0)), gson.fromJson(pList.get(1), int[].class));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -116,7 +119,8 @@ public class KeyWordSearch implements HttpFunction {
                         try {
                             backInfo = getDirectorsMovies(pList.get(0), gson.fromJson(pList.get(1), int[].class));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -128,7 +132,8 @@ public class KeyWordSearch implements HttpFunction {
                         try {
                             backInfo = getDirectorMovies(Integer.parseInt(pList.get(0)), gson.fromJson(pList.get(1), int[].class));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
@@ -141,7 +146,8 @@ public class KeyWordSearch implements HttpFunction {
                         try {
                             backInfo = getMovieInfo(Integer.parseInt(pList.get(0)), gson.fromJson(pList.get(1), int[].class));
                         } catch (Exception e) {
-                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest);
+                            backInfo = "[ERROR]: Wrong parameter format!\n\nUrl info:\n" + getUrlInfo(httpRequest)+
+                                    "\n\n"+e.getMessage();
                         }
                     }
                     break;
