@@ -159,6 +159,30 @@ public class MovieInfoController {
         return movies;
     }
 
+    public ArrayList<Movie> getMoviesByPeopleId(int peopleId, int[] limit) throws SQLException {
+        String template = "select id,title,year,rating,votes from `movies` " +
+                "inner join `stars` on `movies`.id=`stars`.movie_id " +
+                "inner join `directors` on `movies`.id=`directors`.movie_id " +
+                "inner join `ratings` on `movies`.id=`ratings`.movie_id " +
+                "where `stars`.`person_id` = \"%s\" or `directors`.`person_id` = \"%s\" " +
+                "group by id " +
+                "order by rating desc " +
+                "limit %s,%s;";
+        ArrayList<Movie> movies = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        String executeSQL = String.format(template, peopleId,peopleId, limit[0], limit[1]);
+        ResultSet result = statement.executeQuery(executeSQL);
+        while (result.next()) {
+            int movieId = result.getInt("id");
+            String title = result.getString("title");
+            int year = result.getInt("year");
+            double rating = result.getDouble("rating");
+            int votes = result.getInt("votes");
+            movies.add(new Movie(movieId, title, year, rating, votes));
+        }
+        return movies;
+    }
+
     public ArrayList<Movie> getMoviesByStarId(int starId, int[] limit) throws SQLException {
         String template = "select * from `movies` " +
                 "inner join `stars` on `movies`.id=`stars`.movie_id " +

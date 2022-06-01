@@ -8,19 +8,19 @@ import java.time.LocalDateTime;
 public class Comment {
     private int commentId;
     private LocalDateTime commentTime;
-    private int moveId;
+    private int movieId;
     private String userAccount;
     private String text;
 
-    public Comment(int commentId, LocalDateTime commentTime, int moveId, String userAccount, String text) {
+    public Comment(int commentId, LocalDateTime commentTime, int movieId, String userAccount, String text) {
         this.commentId = commentId;
         this.commentTime = commentTime;
-        this.moveId = moveId;
+        this.movieId = movieId;
         this.userAccount = userAccount;
         this.text = text;
     }
 
-    public Comment(int commentId, String commentTimeString, int moveId, String userAccount, String text) {
+    public Comment(int commentId, String commentTimeString, int movieId, String userAccount, String text) {
         this.commentId = commentId;
         int yyyy = Integer.parseInt(commentTimeString.split(" ")[0].split("-")[0]);
         int mm = Integer.parseInt(commentTimeString.split(" ")[0].split("-")[1]);
@@ -29,13 +29,13 @@ public class Comment {
         int m = Integer.parseInt(commentTimeString.split(" ")[1].split(":")[1]);
         int s = Integer.parseInt(commentTimeString.split(" ")[1].split(":")[2]);
         this.commentTime = LocalDateTime.of(yyyy,mm,dd,h,m,s);
-        this.moveId = moveId;
+        this.movieId = movieId;
         this.userAccount = userAccount;
         this.text = text;
     }
 
-    public Comment(int moveId, String userAccount, String text) {
-        this(-1, LocalDateTime.now(), moveId, userAccount, text);
+    public Comment(int movieId, String userAccount, String text) {
+        this(-1, LocalDateTime.now(), movieId, userAccount, text);
     }
 
     public int getCommentId() {
@@ -51,8 +51,8 @@ public class Comment {
         return String.format(basic, commentTime.getYear(), commentTime.getMonthValue(), commentTime.getDayOfMonth(), commentTime.getHour(), commentTime.getMinute(), commentTime.getSecond());
     }
 
-    public int getMoveId() {
-        return moveId;
+    public int getMovieId() {
+        return movieId;
     }
 
     public String getUserAccount() {

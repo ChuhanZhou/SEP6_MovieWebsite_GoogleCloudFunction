@@ -2,8 +2,6 @@ package database;
 
 import model.Comment;
 import model.CommentList;
-import model.User;
-import org.checkerframework.checker.units.qual.C;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -40,10 +38,10 @@ public class MovieCommentController {
     public Comment addComment(Comment comment) throws SQLException {
         String template = "insert into `MovieComment` (userAccount,movieId,time,text) values (\"%s\",\"%s\",\"%s\",\"%s\");";
         Statement statement = connection.createStatement();
-        String executeSQL = String.format(template, comment.getUserAccount(), comment.getMoveId(), comment.getCommentTimeString(), comment.getText());
+        String executeSQL = String.format(template, comment.getUserAccount(), comment.getMovieId(), comment.getCommentTimeString(), comment.getText());
         int result = statement.executeUpdate(executeSQL);
         if (result == 1) {
-            return getCommentsByUserMovieTime(comment.getUserAccount(), comment.getMoveId(), comment.getCommentTimeString()).getByIndex(-1);
+            return getCommentsByUserMovieTime(comment.getUserAccount(), comment.getMovieId(), comment.getCommentTimeString()).getByIndex(-1);
         }
         return null;
     }

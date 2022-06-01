@@ -18,9 +18,9 @@ public class Main {
         MovieCommentController movieCommentController = databaseManagement.getMovieCommentController();
         MovieLikeController movieLikeController = databaseManagement.getMovieLikeController();
         Gson gson = new Gson();
-        int[] a = new int[]{0,10};
-        gson.fromJson("[0,9]", int[].class);
-        ArrayList<Movie> movies = movieInfoController.getMoviesByKeyword("","","",a,"and","year");
+        int[] a = new int[]{0,99};
+
+        ArrayList<Movie> movies = movieInfoController.getMoviesByPeopleId(80,a);
         System.out.println(gson.toJson(movies));
     }
 }

@@ -259,7 +259,7 @@ public class MovieInfoManagement implements HttpFunction {
 
     private String getCommentsByUser(String account, int[] limit) throws SQLException {
         if (limit == null || limit.length != 2) {
-            limit = new int[]{0, 100};
+            limit = new int[]{0, 10};
         } else {
             limit[1] = limit[1] - limit[0];
         }
@@ -269,7 +269,7 @@ public class MovieInfoManagement implements HttpFunction {
 
     private String getCommentsByMovie(int movieId, int[] limit) throws SQLException {
         if (limit == null || limit.length != 2) {
-            limit = new int[]{0, 100};
+            limit = new int[]{0, 10};
         } else {
             limit[1] = limit[1] - limit[0];
         }
@@ -313,7 +313,7 @@ public class MovieInfoManagement implements HttpFunction {
 
     private String getLikeMovies(String account, String password, int[] limit) throws SQLException {
         if (limit == null || limit.length != 2) {
-            limit = new int[]{0, 100};
+            limit = new int[]{0, 10};
         } else {
             limit[1] = limit[1] - limit[0];
         }
